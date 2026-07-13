@@ -14,7 +14,7 @@ int pow(int base, int exp) {
 
 int tetrate(int base, int height) {
   if (height == 0)
-    return 0;
+    return 1;
   int exponent = tetrate(base, height - 1);
   if (exponent < 0)
     return -1;

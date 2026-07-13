@@ -39,7 +39,7 @@ fn tetrate(
     return_value: *BigInt,
 ) !*BigInt {
     if (height.eqlZero()) {
-        try return_value.set(0);
+        try return_value.set(1);
     } else {
         try height.addScalar(height, -1);
         try return_value.pow(
