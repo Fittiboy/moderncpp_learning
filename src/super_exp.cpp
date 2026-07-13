@@ -12,10 +12,10 @@ int pow(int base, int exp) {
   return ret;
 }
 
-int superExponential(int base, int super_exp) {
-  if (super_exp == 0)
+int tetrate(int base, int height) {
+  if (height == 0)
     return 0;
-  int exponent = superExponential(base, super_exp - 1);
+  int exponent = tetrate(base, height - 1);
   if (exponent < 0)
     return -1;
   return pow(base, exponent);
@@ -23,7 +23,7 @@ int superExponential(int base, int super_exp) {
 
 int main() {
   for (int i = 0;; i++) {
-    int res = superExponential(2, i);
+    int res = tetrate(2, i);
     std::cout << "2_" << i << " = ";
     if (res < 0) {
       std::cout << "https://sites.google.com/site/largenumbers/home/appendix/a/"
