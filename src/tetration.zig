@@ -15,7 +15,6 @@ pub fn main(init: std.process.Init) !void {
     while (true) : (i += 1) {
         try super_exp.addScalar(&super_exp, i);
         const res = tetrate(
-            proc_allocator,
             &base,
             &super_exp,
             &return_value,
@@ -33,7 +32,6 @@ pub fn main(init: std.process.Init) !void {
 }
 
 fn tetrate(
-    gpa: std.mem.Allocator,
     base: *BigInt,
     height: *BigInt,
     return_value: *BigInt,
@@ -45,7 +43,6 @@ fn tetrate(
         try return_value.pow(
             base,
             try (try tetrate(
-                gpa,
                 base,
                 height,
                 return_value,
