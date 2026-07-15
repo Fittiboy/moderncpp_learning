@@ -6,6 +6,10 @@ const compile_flags = config.compile_flags;
 const clang_tidy = config.clang_tidy;
 
 pub fn build(b: *std.Build) void {
+    // When compiling for Valgrind, the CPU model is changed
+    // to `.baseline`, to avoid emitting illegal instructions.
+    // Hence a query here, which can be modified before it is
+    // resolved.
     var target_query = b.standardTargetOptionsQueryOnly(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -20,7 +24,6 @@ pub fn build(b: *std.Build) void {
 
     const valgrind = b.option(bool, "valgrind", "Build the program for Valgrind profiling") orelse false;
     if (valgrind) target_query.cpu_model = .baseline;
-
     const target = b.resolveTargetQuery(target_query);
 
     const mod = b.createModule(.{
@@ -28,23 +31,23 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
         .link_libcpp = true,
 
+        // Valgrind-specific settings.
         .valgrind = if (valgrind) true else null,
         .omit_frame_pointer = if (valgrind) false else null,
         .strip = if (valgrind) false else null,
     });
 
+    // Generating and writing files for our language server and
+    // formatter to use.
     const write = b.addWriteFiles();
     const clang_tidy_file = write.add(".clang-tidy", clang_tidy);
     const compile_flags_file = write.add(
         "compile_flags.txt",
         std.mem.join(b.allocator, "\n", compile_flags) catch @panic("OOM"),
     );
-
     const update = b.addUpdateSourceFiles();
     update.addCopyFileToSource(clang_tidy_file, ".clang-tidy");
     update.addCopyFileToSource(compile_flags_file, "compile_flags.txt");
-
-    mod.addIncludePath(b.path(include_dir));
 
     const root = b.option(
         []const u8,
@@ -53,6 +56,7 @@ pub fn build(b: *std.Build) void {
     ) orelse "main";
     const root_path = b.path(b.fmt("src/{s}.cpp", .{root}));
 
+    mod.addIncludePath(b.path(include_dir));
     mod.addCSourceFile(.{
         .file = root_path,
         .flags = final_flags,
