@@ -3,9 +3,7 @@
 #include <expected>
 #include <iostream>
 
-enum class TetrationError {
-  overflow,
-};
+enum class TetrationError { overflow };
 
 std::expected<int, TetrationError> pow(int base, int exp) {
   int ret = 1;
@@ -28,7 +26,7 @@ std::expected<int, TetrationError> tetrate(int base, int height) {
 
 int main() {
   for (int i = 0;; i++) {
-    std::cout << "2_" << i << " = ";
+    std::cout << "2↑↑" << i << " = ";
     auto res = tetrate(2, i);
     if (res) {
       std::cout << res.value() << '\n';
