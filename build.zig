@@ -13,15 +13,6 @@ pub fn build(b: *std.Build) void {
     var target_query = b.standardTargetOptionsQueryOnly(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    var final_flags = compile_flags;
-    if (optimize == .Debug) {
-        final_flags = std.mem.concat(
-            b.allocator,
-            []const u8,
-            &.{ compile_flags, &.{"-ggdb"} },
-        ) catch @panic("OOM");
-    }
-
     const valgrind = b.option(bool, "valgrind", "Build the program for Valgrind profiling") orelse false;
     if (valgrind) target_query.cpu_model = .baseline;
     const target = b.resolveTargetQuery(target_query);
@@ -59,7 +50,7 @@ pub fn build(b: *std.Build) void {
     mod.addIncludePath(b.path(include_dir));
     mod.addCSourceFile(.{
         .file = root_path,
-        .flags = final_flags,
+        .flags = compile_flags,
     });
 
     const c_files = b.option(
@@ -73,7 +64,7 @@ pub fn build(b: *std.Build) void {
             .file = b.path(
                 b.fmt("src/{s}.cpp", .{c_file}),
             ),
-            .flags = final_flags,
+            .flags = compile_flags,
         });
     }
 
